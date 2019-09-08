@@ -8,3 +8,26 @@ This system can be used in an interactive installation where a story is told thr
 The system is equipped with a Raspberry Pi Zero W and four Sonar sensors per bucket, two per each site. Each sonar sensor pair is responsible to detect the movement and the direction of a person. Two pairs together are then responsible to define, if a person went into a bucket, is still inside or already went our from a bucket. With multiple bucket-sensors combined, the system determines a "breadcrumb" system of a person, defining the chronological history of a person's experience in the whole installation.
 
 ![architecture graph](architecture.png)
+
+## Installation
+
+### 1. Setup hardware
+1. Setup a headless Raspberry Pi.
+2. Connect four sonar sensors on the Pi.
+
+### 2. Setup python environment
+1. Make a python environment
+2. Install dependencies by calling
+```
+pip install -r requirements.txt
+```
+3. 
+
+### Optional: 3. Setup frontend environment
+Only needed if you want to change it.
+1. Install npm
+2. Go to `player` folder with your terminal
+3. Run `npm install` to install all dependencies
+
+### 3. Run 
+Call `python main.py`. This starts a webserver on `http://localhost:5000` where you will find the player UI.
