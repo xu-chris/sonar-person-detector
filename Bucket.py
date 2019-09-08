@@ -59,9 +59,9 @@ def evaluate_directions(old_directions, new_directions):
 
 class Bucket:
 
-    def __init__(self):
-        self.left_direction_detector = DirectionDetector()
-        self.right_direction_detector = DirectionDetector()
+    def __init__(self, devices):
+        self.left_direction_detector = DirectionDetector(devices[0], devices[1])
+        self.right_direction_detector = DirectionDetector(devices[2], devices[3])
         self.current_directions = None
 
     def setup(self):

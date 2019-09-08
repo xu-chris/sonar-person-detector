@@ -51,11 +51,11 @@ def evaluate_direction(old_detection, new_detection):
 
 class DirectionDetector:
 
-    def __init__(self):
+    def __init__(self, left_device=[25, 27], right_device=[5, 6]):
         self.current_detection = None
-        self.sensor_left = Sensor(trigger_channel=22, echo_channel=27)
-        self.sensor_right = Sensor(trigger_channel=5, echo_channel=6)
-        logging.debug('DirectionDetector initialized')
+        self.sensor_left = Sensor(trigger_channel=left_device[0], echo_channel=left_device[1])
+        self.sensor_right = Sensor(trigger_channel=right_device[0], echo_channel=right_device[1])
+        print('DirectionDetector initialized')
 
         self.setup()
 

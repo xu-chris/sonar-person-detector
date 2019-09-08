@@ -1,0 +1,16 @@
+logging_level: print
+
+left_device:
+  left_sensor:
+    trigger_channel: 14
+    echo_channel: 15
+  right_sensor:
+    trigger_channel: 23
+    echo_channel: 24
+right_device:
+  left_sensor:
+    trigger_channel: 4
+    echo_channel: 17
+  right_sensor:
+    trigger_channel: 27
+    echo_channel: 22
