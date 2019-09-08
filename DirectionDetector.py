@@ -71,8 +71,9 @@ class DirectionDetector:
         self.sensor_right.calibrate(for_seconds=10, threshold_reduction=0.1)
 
         # Get current result
+        print('Make the first detection....')
         self.current_detection = (self.sensor_left.detect(), self.sensor_right.detect())
-        logging.debug('Current detection result: {}'.format(self.current_detection))
+        print('Current detection result: {}'.format(self.current_detection))
 
     def detect(self):
         """
@@ -82,7 +83,7 @@ class DirectionDetector:
 
         # Get result of detectors first
         new_detection = (self.sensor_left.detect(), self.sensor_right.detect())
-        logging.debug('Detection run result: {}'.format(new_detection))
+        print('Detection run result: {}'.format(new_detection))
 
         # Compare with simple state comparison
         result = evaluate_direction(self.current_detection, new_detection)
