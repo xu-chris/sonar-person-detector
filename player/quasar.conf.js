@@ -61,8 +61,8 @@ module.exports = function (ctx) {
 
     build: {
       scopeHoisting: true,
-      distDir: '../templates',
-      publicPath: 'templates',
+      distDir: '../static',
+      publicPath: 'static',
       // vueRouterMode: 'history',
       // vueCompiler: true,
       // gzip: true,

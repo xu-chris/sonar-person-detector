@@ -1,5 +1,13 @@
 <template>
-  <video
+  <Media
+    :kind="'video'"
+    :controls="false"
+    :src="source"
+    :autoplay="true"
+    :style="{width: '100%'}"
+    @canplay="onCanPlayThrough($event)"
+  />
+  <!-- <video
     id="player"
     autoplay="autoplay"
     muted="muted"
@@ -12,7 +20,7 @@
     <source :src="source"
             :type="type">
       Your browser does not support MP4 Format videos or HTML5 Video.
-  </video>
+  </video> -->
 </template>
 
 <style scoped>
@@ -23,17 +31,22 @@
 </style>
 
 <script>
-import { axios } from 'axios'
+import axios from 'axios'
+import Media from '@dongido/vue-viaudio'
 import { setTimeout } from 'timers'
 
 export default {
   name: 'Player',
+  components: {
+    Media
+  },
   beforeMount () {
+    this.getState()
     this.reload()
   },
   data () {
     return {
-      source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_2mb.mp4',
+      source: '',
       type: 'video/mp4',
       state: 'stop'
     }
@@ -55,21 +68,25 @@ export default {
     },
 
     getState () {
-      axios
-        .get('/current/')
+      axios.get('/current/')
         .then(response => {
           let state = response.data['state']
 
           if (state !== this.state) {
             this.actByState(state)
             this.state = state
+            console.log('New state: ' + state)
           }
+        })
+        .catch(e => {
+          console.log(e)
         })
     },
 
     reload () {
       setTimeout(function () {
         this.getState()
+        this.reload()
       }.bind(this), 1000)
     }
   }
