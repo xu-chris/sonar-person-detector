@@ -74,13 +74,31 @@ class Sensor:
         Calibrates the sensor by setting the lowest trigger value recorded in 5 seconds - 10% as a threshold.
         """
 
-        tick = tock = datetime.now()
-        while (tock - tick).totalSeconds() > for_seconds:
+        # Set the activation threshold really high
+        self.activation_threshold = 10000
+
+        start_time = datetime.now()
+        current_time = datetime.now()
+        print('Calibration starts at {}, used pins: trigger: {}, echo: {}'.format(start_time, self.trigger_channel, self.echo_channel))
+
+        while (current_time - start_time).seconds < for_seconds:
 
             # Measure
             measurement = self.measure()
 
             # If Xth percentage of the measurement is lower than current activation threshold, save new threshold
-            if measurement * (1 - threshold_reduction) < self.activation_threshold:
+            if measurement <= 0:
+                print('Sensor on pins {}, {} seems to be broken. invalid measurement result: {}'.format(self.trigger_channel, self.echo_channel, measurement))
+            elif measurement < 100:
+                print('Measurement is smaller than 100. Is something in it\'s way? Pins: {}, {} ;  Measurement: {}'.format(self.trigger_channel, self.echo_channel, measurement))
+            elif measurement * (1 - threshold_reduction) < self.activation_threshold:
                 self.activation_threshold = measurement * (1 - threshold_reduction)
-                logging.debug('Saved new activation threshold: {}'.format(self.activation_threshold))
+                print('Saved new activation threshold: {}'.format(self.activation_threshold))
+            else:
+                print('No new measurements. Skipping...')
+            current_time = datetime.now()
+
+        print('Finished calibration at {}, used pins: trigger: {}, echo: {}'.format(current_time, self.trigger_channel,
+                                                                                  self.echo_channel))
+
+        return True
