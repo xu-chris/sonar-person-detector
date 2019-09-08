@@ -6,20 +6,10 @@ import logging
 
 class Sensor:
 
-    def __init__(self, echo_channel=27, trigger_channel=22):
+    def __init__(self, trigger_channel=22, echo_channel=27):
         self.activation_threshold = None
-        self.echo_channel = echo_channel
         self.trigger_channel = trigger_channel
-
-        self.setup()
-
-    def setup(self):
-        """
-        Set up the GPIO pin pair for the sensor
-        """
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.trigger_channel, GPIO.OUT)
-        GPIO.setup(self.echo_channel, GPIO.OUT)
+        self.echo_channel = echo_channel
 
     def measure(self):
         """
@@ -27,13 +17,21 @@ class Sensor:
         :return: distance of current measurement
         """
 
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        print('Setting up sensor. Trigger: {}, echo: {}'.format(self.trigger_channel, self.echo_channel))
+        print('Function of the chosen pins: {}, {}'.format(GPIO.gpio_function(self.trigger_channel),
+                                                           GPIO.gpio_function(self.echo_channel)))
+        GPIO.setup(self.trigger_channel, GPIO.OUT)
+        GPIO.setup(self.echo_channel, GPIO.IN)
+
         start_time = time.time()
         stop_time = time.time()
         # set Trigger to HIGH
-        GPIO.output(self.trigger_channel, True)
+        GPIO.output(self.trigger_channel, GPIO.HIGH)
         # set Trigger after 0.01ms to LOW
         time.sleep(0.00001)
-        GPIO.output(self.trigger_channel, False)
+        GPIO.output(self.trigger_channel, GPIO.LOW)
 
         # save start_time
         while GPIO.input(self.echo_channel) == 0:
@@ -48,7 +46,8 @@ class Sensor:
         # multiply with the sonic speed (34300 cm/s)
         # and divide by 2, because time sent and received is the doubled time
         distance = (time_elapsed * 34300) / 2
-        logging.debug('Measured distance: {}'.format(distance))
+        # print('Measured distance: {}'.format(distance))
+        GPIO.cleanup([self.trigger_channel, self.echo_channel])
         return distance
 
     def obstacle_detected(self, distance):
