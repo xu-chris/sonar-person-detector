@@ -21,7 +21,7 @@ The system is equipped with a Raspberry Pi Zero W and four Sonar sensors per buc
 ```
 pip install -r requirements.txt
 ```
-3. 
+3. Run `python main.py`
 
 ### Optional: 3. Setup frontend environment
 Only needed if you want to change it.
