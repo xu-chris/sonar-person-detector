@@ -3,26 +3,25 @@ from Bucket import Bucket
 from BucketState import BucketState
 from Player import Player
 import time
+import yaml
+from threading import Thread
 
 from flask import Flask  # For REST API suppprt
-from flask import request
-from flask import abort
 from flask import jsonify
-from flask import escape
 from flask import render_template
-from flask import make_response
 from flask_cors import CORS
 
 # Setup player server
-app = Flask(__name__)
+app = Flask(__name__, template_folder='static')
 CORS(app)
+config = None
 bucketplayer = None
 
 
 class BucketPlayer:
 
-    def __init__(self):
-        self.bucket = Bucket()
+    def __init__(self, devices):
+        self.bucket = Bucket(devices)
         self.player = Player()
         self.bucket_state = BucketState.UNKNOWN
 
@@ -53,17 +52,59 @@ def set_logging():
     logging.info('Started service')
 
 
-@app.route('/current/', methods=['GET'])
-def get_player_state():
-    bucketplayer.player.state()
+def read_config():
+    global config
+
+    with open("config.yml", 'r') as yml_file:
+        config = yaml.load(yml_file, Loader=yaml.FullLoader)
 
 
-if __name__ == '__main__':
+def run_detection():
+    global bucketplayer
 
-    set_logging()
+    devices = [
+        [
+            config['left_device']['left_sensor']['trigger_channel'],
+            config['left_device']['left_sensor']['echo_channel']
+        ],
+        [
+            config['left_device']['right_sensor']['trigger_channel'],
+            config['left_device']['right_sensor']['echo_channel']
+        ],
+        [
+            config['right_device']['left_sensor']['trigger_channel'],
+            config['right_device']['left_sensor']['echo_channel']
+        ],
+        [
+            config['right_device']['right_sensor']['trigger_channel'],
+            config['right_device']['right_sensor']['echo_channel']
+        ]
+    ]
 
-    bucketplayer = BucketPlayer()
+    bucketplayer = BucketPlayer(devices)
 
     while True:
         bucketplayer.run_detection()
         time.sleep(0.1)
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+
+@app.route('/current/', methods=['GET'])
+def get_player_state():
+    print('Frontend fetches current state...')
+    state = bucketplayer.player.state()
+    return jsonify({'state': state}), 201
+
+
+if __name__ == '__main__':
+
+    read_config()
+
+    set_logging()
+
+    server = Thread(target=app.run(host='0.0.0.0', port=5000, debug=True)).start()
+    detector = Thread(run_detection()).start()
